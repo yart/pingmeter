@@ -6,10 +6,10 @@ class DBClient
   def initialize(**opts)
     dbms  = opts[:dbms] || :mysql
     @opts = {
-      host: opts[:host],
-      port: opts[:port],
-      user: opts[:username],
-      pass: opts[:password]
+      host:     opts[:host],
+      port:     opts[:port],
+      username: opts[:username],
+      password: opts[:password]
     }
     @opts.merge!(symbolize_keys: true) if dbms == :mysql
   end
@@ -26,6 +26,7 @@ class DBClient
     end
     
     begin
+      host.query('USE test_servers_com;')
       response = host.query(query)
     rescue => e
       puts e.full_message
@@ -42,9 +43,8 @@ class DBClient
       (
         `id`          BIGINT(20) AUTO_INCREMENT PRIMARY KEY,
         `duration`    FLOAT(10)  NOT NULL,
-        `measured_at` DATETIME   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      ) DEFAULT CHARSET = `utf8mb4`
-        COLLATE = utf8mb4_unicode_520_ci;
+        `measured_at` DATETIME   NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
     SQL
   end
   
@@ -59,16 +59,15 @@ class DBClient
         `updated_at` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         UNIQUE KEY `address` (`address`),
         INDEX      `deleted` (`deleted`)
-      ) DEFAULT CHARSET = `utf8mb4`
-        COLLATE = utf8mb4_unicode_520_ci;
+      );
     SQL
   end
   
   def add_ip(ip)
-    if exist?(ip)
-      execute "UPDATE `#{ADDRESSES_TABLE_NAME}` SET `deleted` = 0 WHERE `address` = '#{ip}';"
-    else
+    if execute("SELECT `id` FROM `#{ADDRESSES_TABLE_NAME}` WHERE `address` = '#{ip}';").to_a.empty?
       execute "INSERT IGNORE INTO `#{ADDRESSES_TABLE_NAME}` (`address`) VALUE('#{ip}');"
+    else
+      execute "UPDATE `#{ADDRESSES_TABLE_NAME}` SET `deleted` = 0 WHERE `address` = '#{ip}';"
     end
   end
   
@@ -77,17 +76,11 @@ class DBClient
   end
   
   def put_duration(**data)
-    execute "INSERT INTO #{data[:ip]} (`duration`, `measured_at`) VALUE(#{data[:duration]}, #{data[:measured_at]})"
+    execute "INSERT INTO `#{data[:ip]}` (`duration`, `measured_at`) VALUE(#{data[:duration]}, '#{data[:measured_at]}')"
   end
   
   def deleted?(ip)
-    !exist?(ip)
+    execute("SELECT `id` FROM `#{ADDRESSES_TABLE_NAME}` WHERE `address` = '#{ip}' AND `deleted` = 0;").to_a.empty?
   end
   
-  private
-  
-  def exist?(ip)
-    !execute("SELECT `id` FROM `#{ADDRESSES_TABLE_NAME}` WHERE `address` = '#{ip}' AND `deleted` = 0;").to_a.empty?
-  end
-
 end

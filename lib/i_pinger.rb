@@ -21,19 +21,25 @@ class IPinger
         begin
           ping = @icmp.ping
         ensure
-          buffer << { ip: @ip, duration: ping ? @icmp.duration : -1, measured_at: DateTime.now }
+          buffer << { ip: @ip, duration: ping ? @icmp.duration : -1, measured_at: DateTime.now.strftime("%Y-%m-%d %H:%M:%S") }
         end
         
         sleep 1
       end
     end
     
-    Thread.new do
+    keeper = Thread.new do
       while !@client.deleted?(@ip) || !buffer.empty? do
-        @client.put_duration(buffer.shift) unless buffer.empty?
+        @client.put_duration(**buffer.shift) unless buffer.empty?
         Thread.kill(pinger) if @client.deleted?(@ip)
+        sleep 0.2
       end
     end
+
+    pinger.alive?
+    
+    pinger.join
+    keeper.join
   
   end
   

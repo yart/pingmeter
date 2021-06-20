@@ -10,6 +10,8 @@ services:
     restart: always
     ports:
       - 8080:4567
+    links:
+      - db
     command: ruby bin/server.rb -o 0.0.0.0
     tty: true
     stdin_open: true
@@ -24,8 +26,6 @@ services:
       MYSQL_DATABASE: test_servers_com
     ports:
       - 6603:3306
-    profiles:
-      - ping
 
   ping:
     container_name: ping
