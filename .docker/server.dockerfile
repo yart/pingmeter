@@ -12,7 +12,6 @@ RUN bundle config --global frozen 1
 WORKDIR $PINGDIR
 #COPY ./Gemfile $PINGDIR
 #COPY ./Gemfile.lock $PINGDIR
-RUN touch $PINGDIR/Gemfile.lock
 RUN bundle install
 #COPY . $PINGDIR
 
