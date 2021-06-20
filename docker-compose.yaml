@@ -1,4 +1,4 @@
-version: '2.2'
+version: '3.9'
 
 services:
 
@@ -24,6 +24,8 @@ services:
       MYSQL_DATABASE: test_servers_com
     ports:
       - 6603:3306
+    profiles:
+      - ping
 
   ping:
     container_name: ping
@@ -32,5 +34,10 @@ services:
       dockerfile: .docker/ping.dockerfile
     links:
       - db
+    depends_on:
+      - db
     tty: true
+    command: ruby bin/ping.rb
     stdin_open: true
+    profiles:
+      - ping

@@ -26,7 +26,7 @@ class DBClient
     end
     
     begin
-      response = host.exec(query)
+      response = host.query(query)
     rescue => e
       puts e.full_message
     ensure

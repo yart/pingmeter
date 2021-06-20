@@ -1,18 +1,22 @@
 FROM ruby:2.7.1-alpine
 
-ENV PINGDIR=/usr/src/app/
-RUN mkdir -p $PINGDIR \
-  && apk --no-cache add git \
-  && git clone https://github.com/yart/pingmeter.git $PINGDIR \
-  && gem install bundler
+RUN apk --no-cache add \
+  build-base \
+  libstdc++ \
+  openssl-dev
+COPY --from=sndbx/libmysqlclient /usr/local/mysql /usr/local/mysql
+
+RUN gem install bundler
 
 ENV PATH $PATH
-RUN bundle config --global frozen 1
+ENV PINGDIR=/usr/src/app/
+RUN bundle config --global frozen 1 \
+  && mkdir -p $PINGDIR
 
 WORKDIR $PINGDIR
-#COPY ./Gemfile $PINGDIR
-#COPY ./Gemfile.lock $PINGDIR
+COPY ./Gemfile $PINGDIR
+COPY ./Gemfile.lock $PINGDIR
 RUN bundle install
-#COPY . $PINGDIR
+COPY . $PINGDIR
 
 EXPOSE 4567
