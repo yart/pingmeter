@@ -9,7 +9,8 @@ services:
       dockerfile: .docker/server.dockerfile
     restart: always
     ports:
-      - 80:4567
+      - 8080:4567
+    command: ruby bin/server.rb -o 0.0.0.0
     tty: true
     stdin_open: true
 
