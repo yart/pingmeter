@@ -1,0 +1,6 @@
+# Example of DB configuration. Please update it with your current values.
+dbms: 'mysql'
+host: 'db'
+port: '3306'
+username: 'root'
+password: 'example'

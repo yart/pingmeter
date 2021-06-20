@@ -1,0 +1,35 @@
+version: '2.2'
+
+services:
+
+  server:
+    container_name: server
+    build:
+      context: .
+      dockerfile: .docker/server.dockerfile
+    restart: always
+    ports:
+      - 80:4567
+    tty: true
+    stdin_open: true
+
+  db:
+    container_name: mysql
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: test_servers_com
+    ports:
+      - 6603:3306
+
+  ping:
+    container_name: ping
+    build:
+      context: .
+      dockerfile: .docker/ping.dockerfile
+    links:
+      - db
+    tty: true
+    stdin_open: true
