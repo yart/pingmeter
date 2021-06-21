@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
 require 'date'
+require 'json'
 require 'net/ping'
 require 'mysql2'
 require 'yaml'
 require_relative '../lib/db_client'
 require_relative '../lib/i_pinger'
+require_relative '../lib/statistics'
 
 db_config_filename = '../db_config.yaml'
 default_db_config  = { host: 'db', port: '3306', username: 'root', password: 'example' }
@@ -19,5 +21,5 @@ when 'add'
 when 'remove'
   pinger.stop
 when 'statistic'
-  pinger.statistic(ARGV[2], ARGV[3])
+  puts pinger.statistic(ARGV[2], ARGV[3])
 end

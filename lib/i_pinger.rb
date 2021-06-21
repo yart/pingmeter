@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class IPinger
+  TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
   
   def initialize(ip:, db_client:)
     @ip     = ip
@@ -21,7 +22,7 @@ class IPinger
         begin
           ping = @icmp.ping
         ensure
-          buffer << { ip: @ip, duration: ping ? @icmp.duration : -1, measured_at: DateTime.now.strftime("%Y-%m-%d %H:%M:%S") }
+          buffer << { ip: @ip, duration: ping ? @icmp.duration : -1, measured_at: DateTime.now.strftime(TIME_FORMAT) }
         end
         
         sleep 1
@@ -35,20 +36,41 @@ class IPinger
         sleep 0.2
       end
     end
-
+    
     pinger.alive?
     
     pinger.join
     keeper.join
-  
   end
   
   def stop
     @client.delete_ip(@ip)
   end
   
-  def statistic(period_start, period_end)
-  
+  def statistic(*period)
+    list = @client.ping_list(@ip, *period.map { |el| DateTime.parse(el).strftime(TIME_FORMAT) })
+    
+    return { status: 'error', message: 'Such IP was not found' }.to_json if list.nil?
+    
+    list_size = list.size
+    negatives = list.select { |el| el.negative? }
+    list.delete_if { |el| el.negative? }
+    
+    negative_count = negatives.nil? ? 0 : negatives.count
+    fails          = (negative_count / list_size * 100).round
+    
+    return { status: 'error', message: "Such IP has no statistics because #{negative_count} packets was transmitted and 0 received back so 100% packet was loss." }.to_json if fails == 100
+    
+    { status: 'ok',
+      data:   {
+        mean:                 list.mean,
+        min:                  list.min,
+        max:                  list.max,
+        median:               list.median,
+        'standard deviation': list.standard_deviation,
+        'fails percent':      "#{fails}%"
+      }
+    }.to_json
   end
 
 end

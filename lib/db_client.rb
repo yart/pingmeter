@@ -83,4 +83,12 @@ class DBClient
     execute("SELECT `id` FROM `#{ADDRESSES_TABLE_NAME}` WHERE `address` = '#{ip}' AND `deleted` = 0;").to_a.empty?
   end
   
+  def ping_list(ip, *period)
+    if execute("SELECT `id` FROM `#{ADDRESSES_TABLE_NAME}` WHERE `address` = '#{ip}';").to_a.empty?
+      nil
+    else
+      execute("SELECT `duration` FROM `#{ip}` WHERE `measured_at` BETWEEN '#{period.first}' AND '#{period.last}';").to_a.map(&:values).flatten
+    end
+  end
+
 end

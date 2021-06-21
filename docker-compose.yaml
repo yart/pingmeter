@@ -8,6 +8,8 @@ services:
       context: .
       dockerfile: .docker/server.dockerfile
     restart: always
+    environment:
+      TZ: Europe/Moscow
     ports:
       - 8080:4567
     links:
@@ -18,26 +20,14 @@ services:
 
   db:
     container_name: mysql
-    image: mysql
+    build:
+      context: .
+      dockerfile: .docker/mysql.dockerfile
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: example
       MYSQL_DATABASE: test_servers_com
+      TZ: Europe/Moscow
     ports:
       - 6603:3306
-
-  ping:
-    container_name: ping
-    build:
-      context: .
-      dockerfile: .docker/ping.dockerfile
-    links:
-      - db
-    depends_on:
-      - db
-    tty: true
-    command: ruby bin/ping.rb
-    stdin_open: true
-    profiles:
-      - ping

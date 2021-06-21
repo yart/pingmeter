@@ -41,7 +41,7 @@ module Server
     
     # /add?ip=1.2.3.4
     get '/add' do
-      pp `ruby bin/ping.rb add #{params[:ip]}`
+      `ruby bin/ping.rb add #{params[:ip]}`
       "<p>#{params[:ip]} was successfully added and started to ping.</p>\n" +
       "<br>\n" +
       "<a href='/'>Back</a>"
@@ -49,7 +49,7 @@ module Server
     
     # /remove?ip=1.2.3.4
     get '/remove' do
-      system "ruby bin/ping.rb remove #{params[:ip]}"
+      `ruby bin/ping.rb remove #{params[:ip]}`
       "<p>#{params[:ip]} was removed from list. Ping was stopped.</p>\n" +
       "<br>\n" +
       "<a href='/'>Back</a>"
@@ -57,8 +57,7 @@ module Server
     
     # /statistic?ip=1.2.3.4&start=2021-06-20T20:31:49&finish=2021-06-20T20:32:00
     get '/statistic' do
-      system "ruby bin/ping.rb statistic #{params[:ip]} #{params[:start]} #{params[:finish]}"
-      "#{ JSON({ json: 'json' }) }"
+      "#{`ruby bin/ping.rb statistic #{params[:ip]} #{params[:start]} #{params[:finish]}`}"
     end
   
   end
