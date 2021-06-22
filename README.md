@@ -28,3 +28,5 @@ something like this: /statistic?ip=1.2.3.4&start=2021-06-20T20:31:49&finish=2021
 
 The app will return you a JSON with results of measurements. It measures mean RTT, min and max RTT, median RTT, standard
 deviation of RTT and percent of measurement fails on period you pointed.
+
+![image](https://user-images.githubusercontent.com/470045/122862062-37e7f380-d329-11eb-8d9b-9ee45e886546.png)
