@@ -30,3 +30,14 @@ The app will return you a JSON with results of measurements. It measures mean RT
 deviation of RTT and percent of measurement fails on period you pointed.
 
 ![image](https://user-images.githubusercontent.com/470045/122862062-37e7f380-d329-11eb-8d9b-9ee45e886546.png)
+
+## Known problems and issues
+
+- The service needs to be improved to better stabylity of work.
+- Also it has some troubles with security. For example it doesn't control requests and users can send all they want. 
+- Docker images keep all information self inside so it needs to be added docker volumes to prevent information loss
+  after restart.
+- Also it needs to add a tool to check on exist the table 'addresses' and if it exists need to run at system start
+  all pings that have status 'deleted' equale to 0.
+- PingMeter ping daemons need to be started at personal container each.
+- API needs to be expanded with at least method for receiving runned pings list.
